@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#263bff">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kailash Study Tracker</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
+header{background:linear-gradient(135deg,#263bff,#7b2cff);color:white;padding:22px 16px;text-align:center}
+header h1{margin:0 0 6px;font-size:25px}header p{margin:0;opacity:.9}
+nav{display:flex;gap:8px;overflow:auto;padding:10px;background:white;position:sticky;top:0;z-index:5}
+nav button{border:0;border-radius:20px;padding:10px 14px;background:#eef1ff;white-space:nowrap;font-weight:700}
+nav button.active{background:#263bff;color:#fff}
+main{max-width:900px;margin:auto;padding:15px}.card{background:white;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 3px 12px #0000000d}
+h2{margin:0 0 12px}.muted{color:#687386}.progress{height:11px;background:#e7ebf2;border-radius:20px;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,#263bff,#9b35ff);transition:.3s}
+.pct{font-weight:800;margin:8px 0 6px}.exam{display:inline-block;background:#f0efff;border-radius:10px;padding:8px;margin:4px;font-size:14px}
+.subject{border:1px solid #e6eaf1;border-radius:13px;margin:10px 0;overflow:hidden}.subject>button{width:100%;border:0;background:#fff;padding:14px;text-align:left;font-size:17px;font-weight:800;display:flex;justify-content:space-between}
+.topics{display:none;padding:0 14px 12px}.topics.open{display:block}.topic{padding:9px 0;border-top:1px solid #eef0f4}.topic label{display:flex;gap:9px;align-items:center}.topic input{width:19px;height:19px}
+.schedule{display:grid;grid-template-columns:130px 1fr;gap:8px}.time,.slot{padding:12px;border-radius:10px;background:#f4f6ff}.time{font-weight:800}
+.quote{font-size:19px;font-weight:800;line-height:1.4;text-align:center;padding:20px;background:linear-gradient(135deg,#fff1cc,#ffe4ef);border-radius:15px}
+textarea{width:100%;min-height:180px;border:1px solid #dce1ea;border-radius:12px;padding:12px;font-size:16px}
+.small{font-size:13px;color:#687386}.reset{float:right;border:0;background:#ffe7e7;color:#a30000;border-radius:8px;padding:7px}
+
+/* Motivational animation */
+.mot-hero{position:relative;overflow:hidden;text-align:center;color:#fff;padding:26px 18px;border-radius:20px;background:linear-gradient(135deg,#101a48,#263bff 55%,#9b35ff);box-shadow:0 10px 28px #263bff30}
+.mot-hero:before,.mot-hero:after{content:"";position:absolute;width:180px;height:180px;border:1px solid #ffffff30;border-radius:50%;animation:orbit 9s linear infinite;pointer-events:none}
+.mot-hero:before{top:-95px;left:-50px}.mot-hero:after{bottom:-120px;right:-35px;animation-direction:reverse}
+.mot-trophy{font-size:54px;display:inline-block;animation:bounce 1.8s ease-in-out infinite;filter:drop-shadow(0 5px 12px #ffd54f66)}
+.mot-hero h2{font-size:25px;margin:8px 0}.mot-hero p{line-height:1.6;margin:8px 0}.mot-tag{display:inline-block;padding:8px 13px;border-radius:30px;background:#ffffff20;border:1px solid #ffffff50;font-weight:800;animation:pulse 2s ease-in-out infinite}
+.mot-quote{position:relative;overflow:hidden;animation:rise .65s both}.mot-quote:nth-child(2){animation-delay:.08s}.mot-quote:nth-child(3){animation-delay:.16s}.mot-quote:nth-child(4){animation-delay:.24s}.mot-quote:nth-child(5){animation-delay:.32s}.mot-quote:nth-child(6){animation-delay:.4s}.mot-quote:nth-child(7){animation-delay:.48s}
+.mot-quote:after{content:"✦";position:absolute;right:15px;top:8px;color:#a78bfa;font-size:24px;animation:twinkle 1.8s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-9px) rotate(4deg)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 #ffffff22}50%{box-shadow:0 0 0 7px #ffffff12}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes twinkle{0%,100%{opacity:.45;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+@media(prefers-reduced-motion:reduce){.mot-hero:before,.mot-hero:after,.mot-trophy,.mot-tag,.mot-quote,.mot-quote:after{animation:none!important}}
+</style>
+</head>
+<body>
+<header><h1>📚 KAILASH STUDY TRACKER</h1><p>Mission • Consistency • Selection 🎯</p></header>
+<nav>
+<button class="active" onclick="show('home',this)">🏠 Home</button>
+<button onclick="show('syllabus',this)">📚 Syllabus</button>
+<button onclick="show('time',this)">⏰ Timetable</button>
+<button onclick="show('tasks',this)">✅ Daily Tasks</button>
+<button onclick="show('motivation',this)">🔥 Motivation</button>
+</nav>
+<main id="app"></main>
+<script>
+const exams=["RSSB/RSMSSB भर्ती","SSC CGL","CET 12th Level","CET Graduation Level","Patwari","Rajasthan Police","Delhi Police","Railway","RPSC Graduation Level / RAS"];
+const subjects={
+"Math":["Number System","LCM & HCF","Percentage","Ratio & Proportion","Average","Profit & Loss","Simple & Compound Interest","Time & Work","Time, Speed & Distance","Algebra","Geometry","Mensuration","Trigonometry","Data Interpretation","Statistics"],
+"Reasoning":["Analogy","Classification","Series","Coding-Decoding","Blood Relations","Direction Sense","Ranking & Order","Syllogism","Venn Diagram","Statement & Conclusion","Clock & Calendar","Puzzle","Non-Verbal Reasoning","Mirror & Water Images"],
+"English":["Vocabulary","Synonyms & Antonyms","One Word Substitution","Idioms & Phrases","Spelling","Grammar","Error Detection","Fill in the Blanks","Sentence Improvement","Active & Passive Voice","Direct & Indirect Speech","Cloze Test","Reading Comprehension"],
+"History":["Ancient India","Vedic Age","Buddhism & Jainism","Maurya Empire","Gupta Empire","Medieval India","Delhi Sultanate","Mughal Empire","Bhakti & Sufi Movement","Modern India","British Rule","Revolt of 1857","Indian National Movement","Constitutional Development","Post-Independence India"],
+"Geography":["Earth & Solar System","Physical Geography","Rocks & Minerals","Climate","Rivers & Drainage","Soils","Natural Vegetation","Agriculture","Industries","Transport","Population","Resources","India: Physical Features","India: Climate","World Geography Basics"],
+"Polity":["Constitution","Preamble","Fundamental Rights","Fundamental Duties","Directive Principles","President & Vice President","Prime Minister & Council","Parliament","Supreme Court","High Courts","Federalism","State Government","Local Government","Constitutional Bodies","Elections","Emergency","Amendments"],
+"Economy":["Basic Economic Concepts","National Income","Money & Banking","Inflation","Fiscal Policy","Monetary Policy","Budget","Taxation","Public Finance","Economic Planning","Poverty & Unemployment","Agriculture & Industry","External Sector","Government Schemes","Indian Economy Current Issues"],
+"General Awareness":["Awards & Honours","Books & Authors","Important Days","Sports","Countries & Capitals","Currencies","Organizations","Important Places","Scientific & Technological Developments","Art & Culture","Miscellaneous GK"],
+"Science":["Physics Basics","Chemistry Basics","Biology Basics","Human Body","Nutrition & Diseases","Environment","Everyday Science","Space & Technology"],
+"Computer":["Computer Fundamentals","Hardware & Software","Operating System","MS Office","Internet","Networking Basics","Cyber Security","Keyboard Shortcuts"],
+"Hindi":["वर्णमाला व वर्तनी","संधि","समास","उपसर्ग व प्रत्यय","संज्ञा","सर्वनाम","विशेषण","क्रिया","काल","वाच्य","अव्यय","पर्यायवाची","विलोम","अनेक शब्दों के लिए एक शब्द","मुहावरे व लोकोक्तियाँ","शब्द शुद्धि","वाक्य शुद्धि","गद्यांश"],
+"Rajasthan Geography":["राजस्थान की स्थिति व विस्तार","भौतिक प्रदेश","नदियाँ व झीलें","जलवायु","मृदा","प्राकृतिक वनस्पति","कृषि","खनिज","उद्योग","जनसंख्या","सिंचाई","पशुपालन","पर्यटन"],
+"Rajasthan History":["प्राचीन राजस्थान","प्रमुख राजवंश","गुर्जर-प्रतिहार","चौहान","मेवाड़","मारवाड़","आमेर/जयपुर","मुगल-राजपूत संबंध","1857 व राजस्थान","प्रजामंडल आंदोलन","राजस्थान का एकीकरण"],
+"Rajasthan Art & Culture":["लोक देवता","संत व संप्रदाय","लोक नृत्य","लोक संगीत","लोक वाद्य","मेले व त्योहार","चित्रकला","हस्तशिल्प","आभूषण व वेशभूषा","जनजातियाँ","भाषाएँ व बोलियाँ","साहित्य","किले व स्थापत्य","परंपराएँ"],
+"Rajasthan Polity":["राज्य शासन व्यवस्था","राज्यपाल","मुख्यमंत्री व मंत्रिपरिषद","विधानसभा","उच्च न्यायालय","पंचायती राज","नगर निकाय","राज्य निर्वाचन आयोग","लोक सेवा आयोग","राज्य वित्त आयोग","प्रशासनिक व्यवस्था","राजस्थान की योजनाएँ"]
+};
+let state=JSON.parse(localStorage.getItem("kst")||"{}");
+function save(){localStorage.setItem("kst",JSON.stringify(state))}
+function progress(arr){let d=arr.filter((_,i)=>state[arr.key+"_"+i]).length;return Math.round(d/arr.length*100)}
+function syllabus(){
+let total=0,done=0; Object.entries(subjects).forEach(([s,a])=>{a.key=s;total+=a.length;a.forEach((_,i)=>{if(state[s+"_"+i])done++})});
+return [done,total,total?Math.round(done/total*100):0]
+}
+function renderHome(){let [d,t,p]=syllabus();return `<div class="card"><h2>🎯 Overall Syllabus Progress</h2><div class="pct">${p}% Complete</div><div class="progress"><div class="bar" style="width:${p}%"></div></div><p class="muted">${d} / ${t} topics completed</p></div><div class="card"><h2>📝 Preparing For</h2>${exams.map(x=>`<span class="exam">${x}</span>`).join("")}</div><div class="card"><h2>🚀 Mission</h2><div class="quote">आज का काम आज ही पूरा करो।<br>Consistency → Confidence → Selection 🏆</div></div>`}
+function renderSyllabus(){return `<div class="card"><h2>📚 Master Syllabus Tracker <button class="reset" onclick="resetAll()">Reset</button></h2><p class="muted">एक ही common tracker — topic पूरा होते ही checkbox tick करो।</p>${Object.entries(subjects).map(([s,a])=>{let d=a.filter((_,i)=>state[s+"_"+i]).length,p=Math.round(d/a.length*100);return `<div class="subject"><button onclick="this.nextElementSibling.classList.toggle('open')"><span>${s}</span><span>${p}%</span></button><div class="topics"><div class="pct">Subject Progress: ${p}%</div><div class="progress"><div class="bar" style="width:${p}%"></div></div>${a.map((x,i)=>`<div class="topic"><label><input type="checkbox" ${state[s+"_"+i]?"checked":""} onchange="toggle('${s.replaceAll("'","\\'")}',${i},this.checked)"> ${x}</label></div>`).join("")}</div></div>`}).join("")}</div>`}
+function renderTime(){return `<div class="card"><h2>⏰ Study Timetable</h2><div class="schedule">
+<div class="time">3:00–8:00 AM</div><div class="slot">📚 Study Slot 1 — Subject बाद में सेट करें</div>
+<div class="time">8:00–9:00 AM</div><div class="slot">☕ Break / Breakfast</div>
+<div class="time">9:00 AM–12:00 PM</div><div class="slot">📚 Study Slot 2 — Subject बाद में सेट करें</div>
+<div class="time">12:00–1:30 PM</div><div class="slot">🍽️ Lunch / Break</div>
+<div class="time">1:30–6:30 PM</div><div class="slot">📚 Study Slot 3 — Subject बाद में सेट करें</div>
+<div class="time">6:30–8:00 PM</div><div class="slot">🌿 Break / Refresh</div>
+<div class="time">8:00–10:00 PM</div><div class="slot">📖 Study + Revision — Subject बाद में सेट करें</div>
+<div class="time">10:00 PM–3:00 AM</div><div class="slot">😴 Sleep</div></div></div>`}
+function renderTasks(){return `<div class="card"><h2>✅ Daily Tasks</h2><p class="muted">यह section अभी खाली रखा गया है। बाद में अपने daily tasks यहाँ लिख सकते हो।</p><textarea id="taskbox" placeholder="आज के tasks यहाँ लिखें...">${localStorage.getItem("dailyTasks")||""}</textarea><button onclick="localStorage.setItem('dailyTasks',document.getElementById('taskbox').value);alert('Tasks saved!')" style="margin-top:10px;padding:10px 15px;border:0;border-radius:9px;background:#263bff;color:#fff">Save Tasks</button></div>`}
+function renderMot(){let q=["मैं कर सकता हूँ। मैं करके दिखाऊँगा।","हर दिन थोड़ा आगे — यही मेरी जीत है।","Consistency is the real superpower.","आज मेहनत, कल परिणाम।","मेरा लक्ष्य बड़ा है, इसलिए मेरी मेहनत भी बड़ी होगी।","Stop wishing. Start doing. 🔥"];return `<div class="card"><div class="mot-hero"><div class="mot-trophy">🏆</div><h2>YOUR DREAM. YOUR MISSION.</h2><p>आज की मेहनत ही कल की पहचान बनेगी।<br>एक topic, एक कदम — Selection की ओर!</p><div class="mot-tag">🔥 NEVER GIVE UP 🔥</div></div><h2 style="margin-top:22px">✨ Daily Motivation</h2>${q.map(x=>`<div class="quote mot-quote" style="margin:12px 0">${x}</div>`).join("")}<p class="small">Animation हल्की रखी गई है ताकि मोबाइल पर आसानी से चले।</p></div>`}
+function show(tab,btn){document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));btn?.classList.add("active");app.innerHTML=tab==="home"?renderHome():tab==="syllabus"?renderSyllabus():tab==="time"?renderTime():tab==="tasks"?renderTasks():renderMot()}
+function toggle(s,i,v){state[s+"_"+i]=v;save();show("syllabus",document.querySelectorAll("nav button")[1])}
+function resetAll(){if(confirm("सभी topic progress reset करें?")){state={};save();show("syllabus",document.querySelectorAll("nav button")[1])}}
+show("home",document.querySelector("nav button"));
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
+}
+</script>
+</body></html>
